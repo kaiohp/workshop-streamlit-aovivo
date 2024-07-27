@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "workshop-streamlit-aovivo"
+version = "0.1.0"
+description = ""
+authors = ["Kaio Silva <kaiohp.silva1@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+packages = [{include = "src"}]
+
+[tool.poetry.dependencies]
+python = "^3.12"
+streamlit = "^1.37.0"
+pandas = "^2.2.2"
+faker = "^26.0.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
