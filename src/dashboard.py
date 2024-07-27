@@ -1,10 +1,30 @@
+import json
+import os
 import time
 
 import pandas as pd
 import streamlit as st
-from confluence_kafka import Consumer
+from confluent_kafka import Consumer
+from dotenv import load_dotenv
 
-from producer import generate_fake_order, regions, vendors
+from producer import regions, vendors
+
+load_dotenv()
+
+consumer_conf = {
+    # Required connection configs for Kafka producer, consumer, and admin
+    "bootstrap.servers": os.environ["BOOTSTRAP_SERVERS"],
+    "security.protocol": "SASL_SSL",
+    "sasl.mechanisms": "PLAIN",
+    "sasl.username": os.environ["SASL_USERNAME"],
+    "sasl.password": os.environ["SASL_PASSWORD"],
+    "group.id": "streamlit-app-agora-vai",
+    "auto.offset.reset": "earliest",
+    "session.timeout.ms": 45000,
+}
+
+consumer = Consumer(consumer_conf)
+consumer.subscribe(["orders"])
 
 st.set_page_config(
     page_title="Workshop Streamlit - Real Time Dashboard",
@@ -21,10 +41,19 @@ def get_data():
 
 
 def new_order():
-    dict_data = generate_fake_order()
-    new_order_df = pd.DataFrame([dict_data])
-    new_order_df["order_date"] = pd.to_datetime(new_order_df["order_date"])
-    return new_order_df
+    try:
+        while True:
+            message = consumer.poll(1.0)
+            if message is not None and message.error() is None:
+                data = message.value().decode("utf-8")
+                dict_data = json.loads(data)
+                new_order_df = pd.DataFrame([dict_data])
+                new_order_df["order_date"] = pd.to_datetime(new_order_df["order_date"])
+                return new_order_df
+    except KeyboardInterrupt:
+        pass
+    finally:
+        consumer.close()
 
 
 orders_df = get_data()
@@ -80,4 +109,9 @@ while True:
         st.header("Orders Dashboard")
         st.dataframe(orders_df.iloc[::-1])
 
-        orders_df = pd.concat([orders_df, new_order()], ignore_index=True)
+        new_order_df = new_order()
+        orders_df = pd.concat(
+            [orders_df, new_order_df],
+            ignore_index=True,
+        )
+        time.sleep(0.1)

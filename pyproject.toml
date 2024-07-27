@@ -12,6 +12,8 @@ python = "^3.12"
 streamlit = "^1.37.0"
 pandas = "^2.2.2"
 faker = "^26.0.0"
+python-dotenv = "^1.0.1"
+confluent-kafka = "^2.5.0"
 
 
 [build-system]
