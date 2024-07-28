@@ -1,11 +1,5 @@
-import json
-import os
-import time
-
 import pandas as pd
 import streamlit as st
-from confluent_kafka import Consumer
-from dotenv import load_dotenv
 
 from consumer import get_message
 from producer import regions, vendors
