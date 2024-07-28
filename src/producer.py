@@ -14,7 +14,7 @@ regions = ["Sul", "Sudeste", "Centro-Oeste", "Norte", "Nordeste"]
 vendors = ["Kaio Silva", "Luciano Galvão", "Fabio Melo", "Estagiario"]
 
 
-def generate_fake_order(start_date="-30d", end_date="today"):
+def generate_fake_order(start_date="today", end_date="today"):
     quantity = fake.random_int(min=1, max=10)
     unit_price = fake.random_int(min=50, max=200)
     total_price = quantity * unit_price
@@ -49,8 +49,8 @@ producer_conf = {
 producer = Producer(producer_conf)
 
 
-def generate_message():
-    data = generate_fake_order()
+def generate_message(data):
+    data = data
     key = data["order_id"]
     value = json.dumps(data)
     producer.produce(topic="orders", key=key, value=value)
@@ -59,5 +59,6 @@ def generate_message():
 
 if __name__ == "__main__":
     while True:
-        generate_message()
+        data = generate_fake_order(start_date="-30d", end_date="today")
+        generate_message(data)
         time.sleep(0.1)

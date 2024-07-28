@@ -90,4 +90,3 @@ while True:
             [orders_df, new_order_df],
             ignore_index=True,
         )
-        time.sleep(0.1)
