@@ -23,8 +23,6 @@ consumer_conf = {
     "session.timeout.ms": 45000,
 }
 
-consumer = Consumer(consumer_conf)
-consumer.subscribe(["orders"])
 
 st.set_page_config(
     page_title="Workshop Streamlit - Real Time Dashboard",
@@ -41,6 +39,9 @@ def get_data():
 
 
 def new_order():
+    consumer = Consumer(consumer_conf)
+    consumer.subscribe(["orders"])
+
     try:
         while True:
             message = consumer.poll(1.0)
